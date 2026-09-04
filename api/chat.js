@@ -74,10 +74,11 @@ export default async function handler(req, res) {
         "Sorry, I couldn't generate an answer.",
     });
   } catch (error) {
-    console.error("AI Tutor error:", error);
+  console.error("AI Tutor error:", error);
 
-    return res.status(500).json({
-      error: "The AI Tutor could not process your request right now.",
-    });
-  }
+  return res.status(500).json({
+    error: error?.message || "Unknown AI error",
+    details: error?.status || null
+  });
+}
 }
