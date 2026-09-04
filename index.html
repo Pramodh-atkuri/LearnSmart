@@ -1,270 +1,3506 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LearnSmart — Smart Education</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'] },
-      colors: { brand: { 500:'#6366f1', 600:'#4f46e5', 700:'#4338ca' } }
-    }
-  }
-}
-</script>
-<style>
-  html{scroll-behavior:smooth}
-  body{background:#f8fafc}
-  .glass{background:rgba(255,255,255,.78);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.65)}
-  .dark body{background:#0f172a}
-  .dark .surface{background:#111827!important;color:#e5e7eb!important;border-color:#1f2937!important}
-  .dark .muted{color:#94a3b8!important}
-  .dark .input{background:#0f172a!important;color:#e5e7eb!important;border-color:#334155!important}
-  .dark .navbg{background:rgba(15,23,42,.88)!important}
-  .fade{animation:fade .45s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .gradient-text{background:linear-gradient(90deg,#4f46e5,#06b6d4);-webkit-background-clip:text;color:transparent}
-  .bar{transition:width .7s ease}
-  .toast{animation:toast 3s forwards}
-  @keyframes toast{0%{opacity:0;transform:translateY(20px)}10%,85%{opacity:1;transform:none}100%{opacity:0;transform:translateY(20px)}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LearnSmart - Smart Education</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#7c3aed'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, Arial, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+
+        .nav-btn {
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .nav-btn.active {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        .dark .nav-btn:hover,
+        .dark .nav-btn.active {
+            background: #312e81;
+            color: white;
+        }
+
+        .surface {
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dark .surface {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc;
+        }
+
+        .dark body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .dark .bg-white {
+            background-color: #1e293b !important;
+        }
+
+        .dark .bg-slate-50 {
+            background-color: #0f172a !important;
+        }
+
+        .dark .text-slate-900 {
+            color: #f8fafc !important;
+        }
+
+        .dark .text-slate-700 {
+            color: #cbd5e1 !important;
+        }
+
+        .dark .text-slate-600 {
+            color: #94a3b8 !important;
+        }
+
+        .dark .border-slate-200 {
+            border-color: #334155 !important;
+        }
+
+        .input {
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .toast {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-scroll {
+                overflow-x: auto;
+            }
+        }
+    </style>
 </head>
-<body class="text-slate-800">
-<nav class="navbg fixed top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-    <button onclick="showPage('home')" class="flex items-center gap-2">
-      <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 text-white grid place-items-center font-black">LS</span>
-      <span class="font-extrabold text-xl">Learn<span class="text-indigo-600">Smart</span></span>
-    </button>
-    <div class="hidden md:flex items-center gap-6 text-sm font-medium">
-      <button onclick="showPage('home')" class="hover:text-indigo-600">Home</button>
-      <button onclick="showPage('dashboard')" class="hover:text-indigo-600">Dashboard</button>
-      <button onclick="showPage('tutor')" class="hover:text-indigo-600">AI Tutor</button>
-      <button onclick="showPage('planner')" class="hover:text-indigo-600">Study Planner</button>
-      <button onclick="showPage('resources')" class="hover:text-indigo-600">Resources</button>
-      <button onclick="showPage('progress')" class="hover:text-indigo-600">Progress</button>
-    </div>
-    <div class="flex items-center gap-2">
-      <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl border border-slate-200 surface grid place-items-center" title="Toggle theme">☀️</button>
-      <button onclick="showPage('dashboard')" class="hidden sm:block px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700">Get Started</button>
-    </div>
-  </div>
-</nav>
 
-<main id="app" class="pt-16"></main>
+<body class="bg-slate-50 text-slate-900">
 
-<div id="toast" class="fixed bottom-5 right-5 z-[100] hidden"></div>
+    <!-- ================= HEADER ================= -->
 
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200">
+
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+                <div class="w-11 h-11 rounded-xl gradient-bg grid place-items-center text-white text-xl">
+                    🎓
+                </div>
+
+                <div>
+                    <h1 class="text-xl font-extrabold gradient-text">
+                        LearnSmart
+                    </h1>
+
+                    <p class="text-xs text-slate-500">
+                        Smart Education Platform
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="hidden md:flex items-center gap-2">
+
+                <button
+                    onclick="showPage('dashboard')"
+                    class="nav-btn active px-4 py-2 rounded-xl text-sm">
+                    Dashboard
+                </button>
+
+                <button
+                    onclick="showPage('ai')"
+                    class="nav-btn px-4 py-2 rounded-xl text-sm">
+                    🤖 AI Tutor
+                </button>
+
+                <button
+                    onclick="showPage('planner')"
+                    class="nav-btn px-4 py-2 rounded-xl text-sm">
+                    📅 Planner
+                </button>
+
+                <button
+                    onclick="showPage('notes')"
+                    class="nav-btn px-4 py-2 rounded-xl text-sm">
+                    📝 Notes
+                </button>
+
+                <button
+                    onclick="showPage('quiz')"
+                    class="nav-btn px-4 py-2 rounded-xl text-sm">
+                    🧠 Quiz
+                </button>
+
+            </div>
+
+
+            <div class="flex items-center gap-2">
+
+                <button
+                    onclick="toggleTheme()"
+                    class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 grid place-items-center">
+                    🌙
+                </button>
+
+                <button
+                    onclick="showPage('profile')"
+                    class="w-10 h-10 rounded-full gradient-bg text-white font-bold">
+                    P
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Mobile navigation -->
+
+        <div class="md:hidden px-3 pb-3 flex gap-2 overflow-x-auto">
+
+            <button
+                onclick="showPage('dashboard')"
+                class="nav-btn active whitespace-nowrap px-3 py-2 rounded-lg text-sm">
+                Dashboard
+            </button>
+
+            <button
+                onclick="showPage('ai')"
+                class="nav-btn whitespace-nowrap px-3 py-2 rounded-lg text-sm">
+                🤖 AI Tutor
+            </button>
+
+            <button
+                onclick="showPage('planner')"
+                class="nav-btn whitespace-nowrap px-3 py-2 rounded-lg text-sm">
+                📅 Planner
+            </button>
+
+            <button
+                onclick="showPage('notes')"
+                class="nav-btn whitespace-nowrap px-3 py-2 rounded-lg text-sm">
+                📝 Notes
+            </button>
+
+            <button
+                onclick="showPage('quiz')"
+                class="nav-btn whitespace-nowrap px-3 py-2 rounded-lg text-sm">
+                🧠 Quiz
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section id="dashboard" class="page active">
+
+            <div class="gradient-bg rounded-3xl p-7 md:p-10 text-white mb-8">
+
+                <div class="max-w-3xl">
+
+                    <p class="text-indigo-200 font-semibold mb-2">
+                        Welcome to LearnSmart 👋
+                    </p>
+
+                    <h2 class="text-3xl md:text-5xl font-extrabold leading-tight">
+                        Learn smarter.
+                        <br>
+                        Learn at your own pace.
+                    </h2>
+
+                    <p class="mt-4 text-indigo-100 max-w-2xl">
+                        An intelligent learning platform that helps students
+                        understand concepts, organize study plans, practice
+                        with quizzes and get personalized AI assistance.
+                    </p>
+
+                    <div class="mt-6 flex flex-wrap gap-3">
+
+                        <button
+                            onclick="showPage('ai')"
+                            class="px-5 py-3 bg-white text-indigo-700 rounded-xl font-bold hover:bg-indigo-50">
+                            Ask AI Tutor 🤖
+                        </button>
+
+                        <button
+                            onclick="showPage('planner')"
+                            class="px-5 py-3 bg-indigo-500/40 border border-white/30 rounded-xl font-bold">
+                            Create Study Plan
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Statistics -->
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-5">
+
+                    <div class="text-3xl mb-2">
+                        📚
+                    </div>
+
+                    <p class="text-sm text-slate-500">
+                        Courses
+                    </p>
+
+                    <h3 class="text-2xl font-extrabold">
+                        8
+                    </h3>
+
+                </div>
+
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-5">
+
+                    <div class="text-3xl mb-2">
+                        🔥
+                    </div>
+
+                    <p class="text-sm text-slate-500">
+                        Day Streak
+                    </p>
+
+                    <h3 class="text-2xl font-extrabold">
+                        12
+                    </h3>
+
+                </div>
+
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-5">
+
+                    <div class="text-3xl mb-2">
+                        ⏱️
+                    </div>
+
+                    <p class="text-sm text-slate-500">
+                        Study Hours
+                    </p>
+
+                    <h3 class="text-2xl font-extrabold">
+                        42h
+                    </h3>
+
+                </div>
+
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-5">
+
+                    <div class="text-3xl mb-2">
+                        🏆
+                    </div>
+
+                    <p class="text-sm text-slate-500">
+                        Points
+                    </p>
+
+                    <h3 class="text-2xl font-extrabold">
+                        2,480
+                    </h3>
+
+                </div>
+
+            </div>
+            <!-- Continue Learning -->
+
+            <div class="grid lg:grid-cols-3 gap-6">
+
+                <div class="lg:col-span-2 surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="flex items-center justify-between mb-5">
+
+                        <div>
+                            <h3 class="text-xl font-extrabold">
+                                Continue Learning
+                            </h3>
+
+                            <p class="text-sm text-slate-500">
+                                Pick up where you left off
+                            </p>
+                        </div>
+
+                        <button
+                            onclick="showPage('resources')"
+                            class="text-indigo-600 font-bold text-sm">
+                            View all
+                        </button>
+
+                    </div>
+
+
+                    <div class="grid md:grid-cols-2 gap-4">
+
+                        <div class="border border-slate-200 rounded-2xl p-5">
+
+                            <div class="flex justify-between">
+
+                                <span class="text-3xl">
+                                    💻
+                                </span>
+
+                                <span class="text-xs font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                                    72%
+                                </span>
+
+                            </div>
+
+                            <h4 class="font-bold mt-4">
+                                Data Structures
+                            </h4>
+
+                            <p class="text-sm text-slate-500 mt-1">
+                                Searching, Sorting & Linked Lists
+                            </p>
+
+                            <div class="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
+
+                                <div
+                                    class="progress-bar h-full bg-indigo-600 rounded-full"
+                                    style="width:72%">
+                                </div>
+
+                            </div>
+
+                            <button
+                                onclick="showPage('ai')"
+                                class="mt-4 text-indigo-600 text-sm font-bold">
+                                Continue →
+                            </button>
+
+                        </div>
+
+
+                        <div class="border border-slate-200 rounded-2xl p-5">
+
+                            <div class="flex justify-between">
+
+                                <span class="text-3xl">
+                                    🧮
+                                </span>
+
+                                <span class="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
+                                    54%
+                                </span>
+
+                            </div>
+
+                            <h4 class="font-bold mt-4">
+                                Mathematics
+                            </h4>
+
+                            <p class="text-sm text-slate-500 mt-1">
+                                Differential Equations & Vector Calculus
+                            </p>
+
+                            <div class="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
+
+                                <div
+                                    class="progress-bar h-full bg-emerald-500 rounded-full"
+                                    style="width:54%">
+                                </div>
+
+                            </div>
+
+                            <button
+                                onclick="showPage('ai')"
+                                class="mt-4 text-emerald-600 text-sm font-bold">
+                                Continue →
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Today's Goal -->
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Today's Goal
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        Keep your learning streak alive
+                    </p>
+
+
+                    <div class="w-36 h-36 mx-auto my-7 rounded-full border-[14px] border-indigo-100 border-t-indigo-600 grid place-items-center">
+
+                        <div class="text-center">
+
+                            <div class="text-2xl font-extrabold">
+                                70%
+                            </div>
+
+                            <div class="text-xs text-slate-500">
+                                Complete
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="space-y-3">
+
+                        <div class="flex justify-between text-sm">
+
+                            <span>
+                                Study
+                            </span>
+
+                            <b>
+                                42 / 60 min
+                            </b>
+
+                        </div>
+
+
+                        <div class="h-2 bg-slate-100 rounded-full">
+
+                            <div
+                                class="h-full bg-indigo-600 rounded-full"
+                                style="width:70%">
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            onclick="showPage('planner')"
+                            class="w-full mt-3 py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                            Start Study Session
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Smart Learning Features -->
+
+            <div class="mt-8">
+
+                <h3 class="text-2xl font-extrabold mb-5">
+                    Smart Learning Features
+                </h3>
+
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+
+                    <button
+                        onclick="showPage('ai')"
+                        class="surface card text-left bg-white border border-slate-200 rounded-2xl p-5">
+
+                        <div class="text-3xl">
+                            🤖
+                        </div>
+
+                        <h4 class="font-bold mt-3">
+                            AI Tutor
+                        </h4>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Get instant personalized explanations.
+                        </p>
+
+                    </button>
+
+
+                    <button
+                        onclick="showPage('planner')"
+                        class="surface card text-left bg-white border border-slate-200 rounded-2xl p-5">
+
+                        <div class="text-3xl">
+                            📅
+                        </div>
+
+                        <h4 class="font-bold mt-3">
+                            Study Planner
+                        </h4>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Plan your study time intelligently.
+                        </p>
+
+                    </button>
+
+
+                    <button
+                        onclick="showPage('notes')"
+                        class="surface card text-left bg-white border border-slate-200 rounded-2xl p-5">
+
+                        <div class="text-3xl">
+                            📝
+                        </div>
+
+                        <h4 class="font-bold mt-3">
+                            Smart Notes
+                        </h4>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Organize and review important concepts.
+                        </p>
+
+                    </button>
+
+
+                    <button
+                        onclick="showPage('quiz')"
+                        class="surface card text-left bg-white border border-slate-200 rounded-2xl p-5">
+
+                        <div class="text-3xl">
+                            🧠
+                        </div>
+
+                        <h4 class="font-bold mt-3">
+                            Adaptive Quiz
+                        </h4>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Practice according to your level.
+                        </p>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= AI TUTOR ================= -->
+
+        <section id="ai" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    AI Tutor 🤖
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Ask questions and get personalized explanations.
+                </p>
+
+            </div>
+
+
+            <div class="grid lg:grid-cols-4 gap-6">
+
+
+                <!-- AI Settings -->
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-5">
+
+                    <h3 class="font-bold">
+                        Learning level
+                    </h3>
+
+
+                    <select
+                        id="level"
+                        class="input w-full mt-3 border rounded-xl p-3 bg-white">
+
+                        <option>
+                            Beginner
+                        </option>
+
+                        <option>
+                            Intermediate
+                        </option>
+
+                        <option>
+                            Advanced
+                        </option>
+
+                        <option>
+                            Exam Preparation
+                        </option>
+
+                    </select>
+
+
+                    <h3 class="font-bold mt-7">
+                        Quick prompts
+                    </h3>
+
+
+                    <div class="space-y-2 mt-3">
+
+
+                        <button
+                            onclick="askAI('Explain simply')"
+                            class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-sm font-semibold">
+                            Explain simply
+                        </button>
+
+
+                        <button
+                            onclick="askAI('Give an example')"
+                            class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-sm font-semibold">
+                            Give an example
+                        </button>
+
+
+                        <button
+                            onclick="askAI('Quiz me')"
+                            class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-sm font-semibold">
+                            Quiz me
+                        </button>
+
+
+                        <button
+                            onclick="askAI('Summarize')"
+                            class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-sm font-semibold">
+                            Summarize
+                        </button>
+
+
+                        <button
+                            onclick="askAI('Exam answer')"
+                            class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-sm font-semibold">
+                            Exam answer
+                        </button>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- Chat Window -->
+
+                <div class="lg:col-span-3 surface bg-white border border-slate-200 rounded-2xl overflow-hidden">
+
+
+                    <div class="p-5 border-b border-slate-200 flex items-center gap-3">
+
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 grid place-items-center">
+                            🤖
+                        </div>
+
+
+                        <div>
+
+                            <b>
+                                LearnSmart AI Tutor
+                            </b>
+
+                            <p class="text-xs text-emerald-600">
+                                ● Ready to help
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="chat"
+                        class="p-5 h-[420px] overflow-y-auto space-y-4 bg-slate-50">
+
+
+                        <div class="max-w-xl bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm">
+
+                            <b>
+                                AI Tutor
+                            </b>
+
+                            <p class="mt-1 text-sm">
+                                Hi! Ask me any academic question.
+                                I can explain concepts simply, give examples,
+                                quiz you, or create exam-ready answers.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="p-4 border-t border-slate-200 flex gap-2">
+
+                        <input
+                            id="question"
+                            class="input flex-1 border rounded-xl p-3"
+                            placeholder="Ask: Explain binary search in simple words..."
+                            onkeydown="if(event.key==='Enter') sendAI()">
+
+
+                        <button
+                            onclick="sendAI()"
+                            class="px-5 rounded-xl bg-indigo-600 text-white font-bold">
+                            Send
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ================= STUDY PLANNER ================= -->
+
+        <section id="planner" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Study Planner 📅
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Organize your study sessions and stay consistent.
+                </p>
+
+            </div>
+
+
+            <div class="grid lg:grid-cols-3 gap-6">
+
+
+                <!-- Planner Form -->
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Create Study Session
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        Add a subject and set your study target.
+                    </p>
+
+
+                    <div class="mt-5 space-y-4">
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Subject
+                            </label>
+
+                            <select
+                                id="plannerSubject"
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option>
+                                    Data Structures
+                                </option>
+
+                                <option>
+                                    Mathematics
+                                </option>
+
+                                <option>
+                                    Java Programming
+                                </option>
+
+                                <option>
+                                    Artificial Intelligence
+                                </option>
+
+                                <option>
+                                    Computer Networks
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Study Duration
+                            </label>
+
+                            <select
+                                id="plannerDuration"
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option value="30">
+                                    30 minutes
+                                </option>
+
+                                <option value="45">
+                                    45 minutes
+                                </option>
+
+                                <option value="60" selected>
+                                    60 minutes
+                                </option>
+
+                                <option value="90">
+                                    90 minutes
+                                </option>
+
+                                <option value="120">
+                                    2 hours
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Focus Area
+                            </label>
+
+                            <input
+                                id="plannerFocus"
+                                class="input w-full mt-2 border rounded-xl p-3"
+                                placeholder="Example: Binary Search">
+
+                        </div>
+
+
+                        <button
+                            onclick="addStudyTask()"
+                            class="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700">
+                            Add to Study Plan
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Today's Schedule -->
+
+                <div class="lg:col-span-2 surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <h3 class="text-xl font-extrabold">
+                                Today's Schedule
+                            </h3>
+
+                            <p class="text-sm text-slate-500 mt-1">
+                                Your planned learning sessions
+                            </p>
+
+                        </div>
+
+                        <span
+                            id="taskCount"
+                            class="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-2 rounded-full">
+                            3 Tasks
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="studyTasks"
+                        class="mt-5 space-y-3">
+
+
+                        <div class="border border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+
+                            <div class="w-11 h-11 rounded-xl bg-indigo-100 grid place-items-center text-xl">
+                                💻
+                            </div>
+
+                            <div class="flex-1">
+
+                                <h4 class="font-bold">
+                                    Data Structures
+                                </h4>
+
+                                <p class="text-sm text-slate-500">
+                                    Binary Search • 60 minutes
+                                </p>
+
+                            </div>
+
+                            <button
+                                onclick="completeTask(this)"
+                                class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 text-sm font-bold">
+                                Complete
+                            </button>
+
+                        </div>
+
+
+                        <div class="border border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+
+                            <div class="w-11 h-11 rounded-xl bg-emerald-100 grid place-items-center text-xl">
+                                🧮
+                            </div>
+
+                            <div class="flex-1">
+
+                                <h4 class="font-bold">
+                                    Mathematics
+                                </h4>
+
+                                <p class="text-sm text-slate-500">
+                                    Differential Equations • 45 minutes
+                                </p>
+
+                            </div>
+
+                            <button
+                                onclick="completeTask(this)"
+                                class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 text-sm font-bold">
+                                Complete
+                            </button>
+
+                        </div>
+
+
+                        <div class="border border-slate-200 rounded-2xl p-4 flex items-center gap-4">
+
+                            <div class="w-11 h-11 rounded-xl bg-purple-100 grid place-items-center text-xl">
+                                ☕
+                            </div>
+
+                            <div class="flex-1">
+
+                                <h4 class="font-bold">
+                                    Revision
+                                </h4>
+
+                                <p class="text-sm text-slate-500">
+                                    Previous Topics • 30 minutes
+                                </p>
+
+                            </div>
+
+                            <button
+                                onclick="completeTask(this)"
+                                class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 text-sm font-bold">
+                                Complete
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Weekly Overview -->
+
+            <div class="surface bg-white border border-slate-200 rounded-2xl p-6 mt-6">
+
+                <div class="flex items-center justify-between mb-5">
+
+                    <div>
+
+                        <h3 class="text-xl font-extrabold">
+                            Weekly Study Overview
+                        </h3>
+
+                        <p class="text-sm text-slate-500">
+                            Track your planned study time
+                        </p>
+
+                    </div>
+
+                    <span class="text-sm font-bold text-indigo-600">
+                        12.5 hours planned
+                    </span>
+
+                </div>
+
+
+                <div class="grid grid-cols-7 gap-2 items-end h-40">
+
+                    <div class="text-center">
+                        <div class="h-16 bg-indigo-200 rounded-t-lg"></div>
+                        <p class="text-xs mt-2">Mon</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="h-24 bg-indigo-300 rounded-t-lg"></div>
+                        <p class="text-xs mt-2">Tue</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="h-20 bg-indigo-300 rounded-t-lg"></div>
+                        <p class="text-xs mt-2">Wed</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="h-32 bg-indigo-500 rounded-t-lg"></div>
+                        <p class="text-xs mt-2">Thu</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="h-28 bg-indigo-400 rounded-t-lg"></div>
+                        <p class="text-xs mt-2">Fri</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="h-36 bg-indigo-600 rounded-t-lg"></div>
+                        <p class="text-xs mt-2">Sat</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="h-12 bg-indigo-200 rounded-t-lg"></div>
+                        <p class="text-xs mt-2">Sun</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SMART NOTES ================= -->
+
+        <section id="notes" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Smart Notes 📝
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Create quick notes and organize important concepts.
+                </p>
+
+            </div>
+
+
+            <div class="grid lg:grid-cols-3 gap-6">
+
+
+                <!-- Create Note -->
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Create a Note
+                    </h3>
+
+                    <div class="mt-5 space-y-4">
+
+                        <input
+                            id="noteTitle"
+                            class="input w-full border rounded-xl p-3"
+                            placeholder="Note title">
+
+                        <select
+                            id="noteSubject"
+                            class="input w-full border rounded-xl p-3 bg-white">
+
+                            <option>
+                                Data Structures
+                            </option>
+
+                            <option>
+                                Mathematics
+                            </option>
+
+                            <option>
+                                Java Programming
+                            </option>
+
+                            <option>
+                                Artificial Intelligence
+                            </option>
+
+                        </select>
+
+
+                        <textarea
+                            id="noteContent"
+                            rows="7"
+                            class="input w-full border rounded-xl p-3 resize-none"
+                            placeholder="Write your important points here..."></textarea>
+
+
+                        <button
+                            onclick="saveNote()"
+                            class="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                            Save Note
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Notes List -->
+
+                <div class="lg:col-span-2 surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <h3 class="text-xl font-extrabold">
+                                My Notes
+                            </h3>
+
+                            <p class="text-sm text-slate-500 mt-1">
+                                Your saved learning notes
+                            </p>
+
+                        </div>
+
+                        <span
+                            id="notesCount"
+                            class="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-2 rounded-full">
+                            2 Notes
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="notesList"
+                        class="mt-5 grid md:grid-cols-2 gap-4">
+
+
+                        <div class="border border-slate-200 rounded-2xl p-5">
+
+                            <div class="flex items-center justify-between">
+
+                                <span class="text-2xl">
+                                    💻
+                                </span>
+
+                                <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-bold">
+                                    Data Structures
+                                </span>
+
+                            </div>
+
+                            <h4 class="font-bold mt-4">
+                                Binary Search
+                            </h4>
+
+                            <p class="text-sm text-slate-500 mt-2 leading-6">
+                                Binary search repeatedly divides a sorted
+                                search space into two halves to find an element.
+                            </p>
+
+                            <button
+                                onclick="showToast('Note opened')"
+                                class="mt-4 text-indigo-600 text-sm font-bold">
+                                Open note →
+                            </button>
+
+                        </div>
+
+
+                        <div class="border border-slate-200 rounded-2xl p-5">
+
+                            <div class="flex items-center justify-between">
+
+                                <span class="text-2xl">
+                                    🧮
+                                </span>
+
+                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold">
+                                    Mathematics
+                                </span>
+
+                            </div>
+
+                            <h4 class="font-bold mt-4">
+                                Vector Calculus
+                            </h4>
+
+                            <p class="text-sm text-slate-500 mt-2 leading-6">
+                                Important formulas and concepts for gradient,
+                                divergence and curl.
+                            </p>
+
+                            <button
+                                onclick="showToast('Note opened')"
+                                class="mt-4 text-emerald-600 text-sm font-bold">
+                                Open note →
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ================= RESOURCES ================= -->
+
+        <section id="resources" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Resource Repository 📚
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Find learning materials and useful study resources.
+                </p>
+
+            </div>
+
+
+            <!-- Search -->
+
+            <div class="surface bg-white border border-slate-200 rounded-2xl p-5 mb-6">
+
+                <div class="flex flex-col md:flex-row gap-3">
+
+                    <input
+                        id="resourceSearch"
+                        class="input flex-1 border rounded-xl p-3"
+                        placeholder="Search resources...">
+
+                    <select
+                        id="resourceSubject"
+                        class="input border rounded-xl p-3 bg-white">
+
+                        <option value="all">
+                            All Subjects
+                        </option>
+
+                        <option value="ds">
+                            Data Structures
+                        </option>
+
+                        <option value="math">
+                            Mathematics
+                        </option>
+
+                        <option value="java">
+                            Java Programming
+                        </option>
+
+                        <option value="ai">
+                            Artificial Intelligence
+                        </option>
+
+                    </select>
+
+                    <button
+                        onclick="searchResources()"
+                        class="px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                        Search
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Resource Cards -->
+
+            <div
+                id="resourceGrid"
+                class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+
+                <div
+                    class="resource-card surface card bg-white border border-slate-200 rounded-2xl p-5"
+                    data-subject="ds">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="text-3xl">
+                            💻
+                        </div>
+
+                        <span class="text-xs font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                            Data Structures
+                        </span>
+
+                    </div>
+
+                    <h3 class="font-extrabold text-lg mt-4">
+                        Searching & Sorting
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Learn linear search, binary search, insertion sort,
+                        selection sort, merge sort and quick sort.
+                    </p>
+
+                    <button
+                        onclick="openResource('Searching & Sorting')"
+                        class="mt-5 text-indigo-600 font-bold text-sm">
+                        Study resource →
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="resource-card surface card bg-white border border-slate-200 rounded-2xl p-5"
+                    data-subject="math">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="text-3xl">
+                            🧮
+                        </div>
+
+                        <span class="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
+                            Mathematics
+                        </span>
+
+                    </div>
+
+                    <h3 class="font-extrabold text-lg mt-4">
+                        Differential Equations
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Review important methods, formulas and solved examples
+                        for differential equations.
+                    </p>
+
+                    <button
+                        onclick="openResource('Differential Equations')"
+                        class="mt-5 text-emerald-600 font-bold text-sm">
+                        Study resource →
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="resource-card surface card bg-white border border-slate-200 rounded-2xl p-5"
+                    data-subject="java">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="text-3xl">
+                            ☕
+                        </div>
+
+                        <span class="text-xs font-bold bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                            Java
+                        </span>
+
+                    </div>
+
+                    <h3 class="font-extrabold text-lg mt-4">
+                        Java Fundamentals
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Practice variables, data types, classes, objects,
+                        inheritance and basic programming.
+                    </p>
+
+                    <button
+                        onclick="openResource('Java Fundamentals')"
+                        class="mt-5 text-orange-600 font-bold text-sm">
+                        Study resource →
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="resource-card surface card bg-white border border-slate-200 rounded-2xl p-5"
+                    data-subject="ai">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="text-3xl">
+                            🤖
+                        </div>
+
+                        <span class="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                            AI
+                        </span>
+
+                    </div>
+
+                    <h3 class="font-extrabold text-lg mt-4">
+                        Artificial Intelligence
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Explore intelligent agents, search techniques and
+                        the foundations of modern AI systems.
+                    </p>
+
+                    <button
+                        onclick="openResource('Artificial Intelligence')"
+                        class="mt-5 text-purple-600 font-bold text-sm">
+                        Study resource →
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="resource-card surface card bg-white border border-slate-200 rounded-2xl p-5"
+                    data-subject="ds">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="text-3xl">
+                            🔗
+                        </div>
+
+                        <span class="text-xs font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                            Data Structures
+                        </span>
+
+                    </div>
+
+                    <h3 class="font-extrabold text-lg mt-4">
+                        Linked Lists
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Understand singly, doubly and circular linked lists
+                        with their operations and applications.
+                    </p>
+
+                    <button
+                        onclick="openResource('Linked Lists')"
+                        class="mt-5 text-indigo-600 font-bold text-sm">
+                        Study resource →
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="resource-card surface card bg-white border border-slate-200 rounded-2xl p-5"
+                    data-subject="math">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="text-3xl">
+                            📐
+                        </div>
+
+                        <span class="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
+                            Mathematics
+                        </span>
+
+                    </div>
+
+                    <h3 class="font-extrabold text-lg mt-4">
+                        Vector Calculus
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Revise gradient, divergence, curl and important
+                        vector calculus theorems.
+                    </p>
+
+                    <button
+                        onclick="openResource('Vector Calculus')"
+                        class="mt-5 text-emerald-600 font-bold text-sm">
+                        Study resource →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= QUIZ ================= -->
+
+        <section id="quiz" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Adaptive Quiz 🧠
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Test your knowledge and identify areas for improvement.
+                </p>
+
+            </div>
+
+
+            <div class="grid lg:grid-cols-3 gap-6">
+
+
+                <!-- Quiz Settings -->
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Quiz Settings
+                    </h3>
+
+                    <div class="mt-5 space-y-4">
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Subject
+                            </label>
+
+                            <select
+                                id="quizSubject"
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option>
+                                    Data Structures
+                                </option>
+
+                                <option>
+                                    Mathematics
+                                </option>
+
+                                <option>
+                                    Java Programming
+                                </option>
+
+                                <option>
+                                    Artificial Intelligence
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Difficulty
+                            </label>
+
+                            <select
+                                id="quizDifficulty"
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option>
+                                    Easy
+                                </option>
+
+                                <option selected>
+                                    Medium
+                                </option>
+
+                                <option>
+                                    Hard
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <button
+                            onclick="startQuiz()"
+                            class="w-full py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                            Start Quiz
+                        </button>
+
+                    </div>
+
+
+                    <div class="mt-7 p-4 rounded-xl bg-indigo-50">
+
+                        <p class="text-sm text-indigo-700 font-semibold">
+                            Your current quiz accuracy
+                        </p>
+
+                        <p class="text-3xl font-extrabold text-indigo-700 mt-1">
+                            78%
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Quiz Area -->
+
+                <div class="lg:col-span-2 surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <h3 class="text-xl font-extrabold">
+                                Practice Question
+                            </h3>
+
+                            <p
+                                id="quizProgress"
+                                class="text-sm text-slate-500 mt-1">
+                                Question 1 of 5
+                            </p>
+
+                        </div>
+
+                        <span
+                            id="quizScore"
+                            class="text-xs font-bold bg-emerald-100 text-emerald-700 px-3 py-2 rounded-full">
+                            Score: 0
+                        </span>
+
+                    </div>
+
+
+                    <div class="mt-6">
+
+                        <div
+                            id="quizQuestion"
+                            class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+
+                            <p class="font-bold text-lg">
+                                What is the main requirement for applying binary search?
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            id="quizOptions"
+                            class="mt-4 space-y-3">
+
+                            <button
+                                onclick="answerQuiz(0)"
+                                class="quiz-option w-full text-left p-4 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50">
+                                The data should be sorted
+                            </button>
+
+                            <button
+                                onclick="answerQuiz(1)"
+                                class="quiz-option w-full text-left p-4 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50">
+                                The data must contain strings
+                            </button>
+
+                            <button
+                                onclick="answerQuiz(2)"
+                                class="quiz-option w-full text-left p-4 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50">
+                                The data must be stored in a stack
+                            </button>
+
+                            <button
+                                onclick="answerQuiz(3)"
+                                class="quiz-option w-full text-left p-4 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50">
+                                No condition is required
+                            </button>
+
+                        </div>
+
+
+                        <button
+                            id="nextQuizBtn"
+                            onclick="nextQuizQuestion()"
+                            class="hidden mt-5 px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                            Next Question →
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ================= PROGRESS ================= -->
+
+        <section id="progress" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Learning Progress 📊
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Track your performance and identify areas for improvement.
+                </p>
+
+            </div>
+
+
+            <div class="grid md:grid-cols-3 gap-5 mb-6">
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="text-3xl">
+                        🎯
+                    </div>
+
+                    <p class="text-sm text-slate-500 mt-3">
+                        Overall Progress
+                    </p>
+
+                    <h3 class="text-3xl font-extrabold mt-1">
+                        68%
+                    </h3>
+
+                    <div class="mt-4 h-2 bg-slate-100 rounded-full">
+
+                        <div
+                            class="h-full bg-indigo-600 rounded-full"
+                            style="width:68%">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="text-3xl">
+                        🧠
+                    </div>
+
+                    <p class="text-sm text-slate-500 mt-3">
+                        Quiz Accuracy
+                    </p>
+
+                    <h3 class="text-3xl font-extrabold mt-1">
+                        78%
+                    </h3>
+
+                    <p class="text-sm text-emerald-600 font-semibold mt-2">
+                        ↑ 8% this week
+                    </p>
+
+                </div>
+
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="text-3xl">
+                        ⏱️
+                    </div>
+
+                    <p class="text-sm text-slate-500 mt-3">
+                        Learning Time
+                    </p>
+
+                    <h3 class="text-3xl font-extrabold mt-1">
+                        42h
+                    </h3>
+
+                    <p class="text-sm text-indigo-600 font-semibold mt-2">
+                        6.5h this week
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid lg:grid-cols-2 gap-6">
+
+
+                <!-- Subject Progress -->
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Subject Progress
+                    </h3>
+
+                    <div class="mt-6 space-y-5">
+
+
+                        <div>
+
+                            <div class="flex justify-between text-sm mb-2">
+
+                                <span class="font-semibold">
+                                    Data Structures
+                                </span>
+
+                                <span class="font-bold">
+                                    72%
+                                </span>
+
+                            </div>
+
+                            <div class="h-3 bg-slate-100 rounded-full">
+
+                                <div
+                                    class="h-full bg-indigo-600 rounded-full"
+                                    style="width:72%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="flex justify-between text-sm mb-2">
+
+                                <span class="font-semibold">
+                                    Mathematics
+                                </span>
+
+                                <span class="font-bold">
+                                    54%
+                                </span>
+
+                            </div>
+
+                            <div class="h-3 bg-slate-100 rounded-full">
+
+                                <div
+                                    class="h-full bg-emerald-500 rounded-full"
+                                    style="width:54%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="flex justify-between text-sm mb-2">
+
+                                <span class="font-semibold">
+                                    Java Programming
+                                </span>
+
+                                <span class="font-bold">
+                                    81%
+                                </span>
+
+                            </div>
+
+                            <div class="h-3 bg-slate-100 rounded-full">
+
+                                <div
+                                    class="h-full bg-orange-500 rounded-full"
+                                    style="width:81%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="flex justify-between text-sm mb-2">
+
+                                <span class="font-semibold">
+                                    Artificial Intelligence
+                                </span>
+
+                                <span class="font-bold">
+                                    64%
+                                </span>
+
+                            </div>
+
+                            <div class="h-3 bg-slate-100 rounded-full">
+
+                                <div
+                                    class="h-full bg-purple-500 rounded-full"
+                                    style="width:64%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Weakness Detection -->
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <h3 class="text-xl font-extrabold">
+                                Weakness Detection
+                            </h3>
+
+                            <p class="text-sm text-slate-500 mt-1">
+                                Topics that need more practice
+                            </p>
+
+                        </div>
+
+                        <span class="text-2xl">
+                            🔍
+                        </span>
+
+                    </div>
+
+
+                    <div class="mt-5 space-y-3">
+
+
+                        <div class="p-4 rounded-xl bg-rose-50 border border-rose-100">
+
+                            <div class="flex justify-between">
+
+                                <div>
+                                    <h4 class="font-bold text-rose-700">
+                                        Differential Equations
+                                    </h4>
+
+                                    <p class="text-xs text-rose-600 mt-1">
+                                        Accuracy: 48%
+                                    </p>
+                                </div>
+
+                                <span class="text-xl">
+                                    ⚠️
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="p-4 rounded-xl bg-amber-50 border border-amber-100">
+
+                            <div class="flex justify-between">
+
+                                <div>
+                                    <h4 class="font-bold text-amber-700">
+                                        Linked Lists
+                                    </h4>
+
+                                    <p class="text-xs text-amber-600 mt-1">
+                                        Accuracy: 61%
+                                    </p>
+                                </div>
+
+                                <span class="text-xl">
+                                    📌
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+
+                            <div class="flex justify-between">
+
+                                <div>
+                                    <h4 class="font-bold text-emerald-700">
+                                        Java Basics
+                                    </h4>
+
+                                    <p class="text-xs text-emerald-600 mt-1">
+                                        Accuracy: 89%
+                                    </p>
+                                </div>
+
+                                <span class="text-xl">
+                                    ✅
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        onclick="showPage('ai')"
+                        class="w-full mt-5 py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                        Practice Weak Topics with AI
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= GAMIFICATION ================= -->
+
+        <section id="achievements" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Achievements 🏆
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Stay motivated by reaching learning milestones.
+                </p>
+
+            </div>
+
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-6 text-center">
+
+                    <div class="text-5xl">
+                        🔥
+                    </div>
+
+                    <h3 class="font-extrabold mt-4">
+                        7 Day Streak
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Study for seven consecutive days.
+                    </p>
+
+                    <span class="inline-block mt-4 text-xs font-bold bg-emerald-100 text-emerald-700 px-3 py-2 rounded-full">
+                        Unlocked
+                    </span>
+
+                </div>
+
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-6 text-center">
+
+                    <div class="text-5xl">
+                        🧠
+                    </div>
+
+                    <h3 class="font-extrabold mt-4">
+                        Quiz Master
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Complete 20 practice questions.
+                    </p>
+
+                    <span class="inline-block mt-4 text-xs font-bold bg-emerald-100 text-emerald-700 px-3 py-2 rounded-full">
+                        Unlocked
+                    </span>
+
+                </div>
+
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-6 text-center">
+
+                    <div class="text-5xl">
+                        📚
+                    </div>
+
+                    <h3 class="font-extrabold mt-4">
+                        Knowledge Seeker
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Complete five learning modules.
+                    </p>
+
+                    <span class="inline-block mt-4 text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-2 rounded-full">
+                        4 / 5
+                    </span>
+
+                </div>
+
+
+                <div class="surface card bg-white border border-slate-200 rounded-2xl p-6 text-center">
+
+                    <div class="text-5xl">
+                        ⭐
+                    </div>
+
+                    <h3 class="font-extrabold mt-4">
+                        High Achiever
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Reach 90% average quiz accuracy.
+                    </p>
+
+                    <span class="inline-block mt-4 text-xs font-bold bg-slate-100 text-slate-600 px-3 py-2 rounded-full">
+                        Locked
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Points -->
+
+            <div class="surface bg-white border border-slate-200 rounded-2xl p-6 mt-6">
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                    <div>
+
+                        <p class="text-sm text-slate-500">
+                            Total Learning Points
+                        </p>
+
+                        <h3 class="text-4xl font-extrabold gradient-text">
+                            2,480 XP
+                        </h3>
+
+                    </div>
+
+                    <div class="md:w-1/2">
+
+                        <div class="flex justify-between text-sm mb-2">
+
+                            <span>
+                                Next level
+                            </span>
+
+                            <b>
+                                2,480 / 3,000 XP
+                            </b>
+
+                        </div>
+
+                        <div class="h-3 bg-slate-100 rounded-full">
+
+                            <div
+                                class="h-full bg-indigo-600 rounded-full"
+                                style="width:82%">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ================= EXAM PREPARATION ================= -->
+
+        <section id="exam" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Exam Preparation 🎯
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Prepare smarter with focused revision and practice.
+                </p>
+
+            </div>
+
+
+            <div class="grid lg:grid-cols-3 gap-6">
+
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="text-4xl">
+                        📖
+                    </div>
+
+                    <h3 class="text-xl font-extrabold mt-4">
+                        Important Topics
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Focus on high-priority concepts before your exam.
+                    </p>
+
+                    <ul class="mt-5 space-y-3 text-sm">
+
+                        <li class="flex gap-2">
+                            <span>✓</span>
+                            Searching and Sorting
+                        </li>
+
+                        <li class="flex gap-2">
+                            <span>✓</span>
+                            Linked Lists and Stacks
+                        </li>
+
+                        <li class="flex gap-2">
+                            <span>✓</span>
+                            Differential Equations
+                        </li>
+
+                        <li class="flex gap-2">
+                            <span>✓</span>
+                            Vector Calculus
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="text-4xl">
+                        ✍️
+                    </div>
+
+                    <h3 class="text-xl font-extrabold mt-4">
+                        Exam Practice
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Practice questions and improve your answer writing.
+                    </p>
+
+                    <button
+                        onclick="showPage('quiz')"
+                        class="mt-6 w-full py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                        Start Practice
+                    </button>
+
+                </div>
+
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <div class="text-4xl">
+                        🤖
+                    </div>
+
+                    <h3 class="text-xl font-extrabold mt-4">
+                        AI Exam Assistant
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        Ask the AI Tutor for exam-ready explanations and answers.
+                    </p>
+
+                    <button
+                        onclick="openExamTutor()"
+                        class="mt-6 w-full py-3 rounded-xl bg-purple-600 text-white font-bold">
+                        Ask AI Tutor
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Exam Checklist -->
+
+            <div class="surface bg-white border border-slate-200 rounded-2xl p-6 mt-6">
+
+                <h3 class="text-xl font-extrabold">
+                    Revision Checklist
+                </h3>
+
+                <div class="grid md:grid-cols-2 gap-4 mt-5">
+
+
+                    <label class="flex items-center gap-3 p-4 rounded-xl bg-slate-50 cursor-pointer">
+
+                        <input
+                            type="checkbox"
+                            class="w-5 h-5 accent-indigo-600">
+
+                        <span class="font-semibold">
+                            Revise important definitions
+                        </span>
+
+                    </label>
+
+
+                    <label class="flex items-center gap-3 p-4 rounded-xl bg-slate-50 cursor-pointer">
+
+                        <input
+                            type="checkbox"
+                            class="w-5 h-5 accent-indigo-600">
+
+                        <span class="font-semibold">
+                            Practice important formulas
+                        </span>
+
+                    </label>
+
+
+                    <label class="flex items-center gap-3 p-4 rounded-xl bg-slate-50 cursor-pointer">
+
+                        <input
+                            type="checkbox"
+                            class="w-5 h-5 accent-indigo-600">
+
+                        <span class="font-semibold">
+                            Solve previous questions
+                        </span>
+
+                    </label>
+
+
+                    <label class="flex items-center gap-3 p-4 rounded-xl bg-slate-50 cursor-pointer">
+
+                        <input
+                            type="checkbox"
+                            class="w-5 h-5 accent-indigo-600">
+
+                        <span class="font-semibold">
+                            Review weak topics
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PROFILE ================= -->
+
+        <section id="profile" class="page">
+
+            <div class="mb-7">
+
+                <h2 class="text-3xl font-extrabold">
+                    Student Profile 👤
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Manage your learning preferences.
+                </p>
+
+            </div>
+
+
+            <div class="grid lg:grid-cols-3 gap-6">
+
+
+                <div class="surface bg-white border border-slate-200 rounded-2xl p-6 text-center">
+
+                    <div class="w-24 h-24 mx-auto rounded-full gradient-bg grid place-items-center text-white text-4xl font-extrabold">
+                        P
+                    </div>
+
+                    <h3 class="text-xl font-extrabold mt-4">
+                        Student
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        LearnSmart Student
+                    </p>
+
+                    <div class="mt-5 flex justify-center gap-2">
+
+                        <span class="px-3 py-2 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">
+                            Learner
+                        </span>
+
+                        <span class="px-3 py-2 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+                            Active
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="lg:col-span-2 surface bg-white border border-slate-200 rounded-2xl p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Learning Preferences
+                    </h3>
+
+
+                    <div class="grid md:grid-cols-2 gap-5 mt-5">
+
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Learning Level
+                            </label>
+
+                            <select
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option>
+                                    Beginner
+                                </option>
+
+                                <option selected>
+                                    Intermediate
+                                </option>
+
+                                <option>
+                                    Advanced
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Daily Study Target
+                            </label>
+
+                            <select
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option>
+                                    30 minutes
+                                </option>
+
+                                <option selected>
+                                    1 hour
+                                </option>
+
+                                <option>
+                                    2 hours
+                                </option>
+
+                                <option>
+                                    3 hours
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Preferred Learning Style
+                            </label>
+
+                            <select
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option>
+                                    Visual
+                                </option>
+
+                                <option>
+                                    Examples
+                                </option>
+
+                                <option>
+                                    Step-by-step
+                                </option>
+
+                                <option>
+                                    Practice
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                Exam Mode
+                            </label>
+
+                            <select
+                                class="input w-full mt-2 border rounded-xl p-3 bg-white">
+
+                                <option>
+                                    Normal
+                                </option>
+
+                                <option>
+                                    Exam Preparation
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        onclick="showToast('Preferences saved successfully')"
+                        class="mt-6 px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold">
+                        Save Preferences
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer class="mt-12 border-t border-slate-200 pt-7 pb-5">
+
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+
+                <div>
+
+                    <h3 class="font-extrabold gradient-text">
+                        LearnSmart
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        Smart Education for the Digital Age.
+                    </p>
+
+                </div>
+
+
+                <div class="flex gap-4 text-sm text-slate-500">
+
+                    <button onclick="showPage('dashboard')">
+                        Dashboard
+                    </button>
+
+                    <button onclick="showPage('ai')">
+                        AI Tutor
+                    </button>
+
+                    <button onclick="showPage('progress')">
+                        Progress
+                    </button>
+
+                    <button onclick="showPage('profile')">
+                        Profile
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <p class="text-center text-xs text-slate-400 mt-6">
+                © 2026 LearnSmart. Smart learning made simple.
+            </p>
+
+        </footer>
+
+    </main>
 <script>
-const app=document.getElementById('app');
-let currentPage='home';
-let quizScore=0;
-let quizIndex=0;
 
-const subjects=[
- {name:'Java Programming',icon:'☕',progress:82,level:'Strong'},
- {name:'Data Structures',icon:'🌳',progress:71,level:'Improve'},
- {name:'Mathematics',icon:'📐',progress:65,level:'Improve'},
- {name:'Artificial Intelligence',icon:'🧠',progress:88,level:'Strong'}
-];
+    /* ================= GLOBAL VARIABLES ================= */
 
-function toast(msg){
- const t=document.getElementById('toast');
- t.innerHTML=`<div class="toast bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl font-medium">${msg}</div>`;
- t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000);
-}
+    let currentQuizQuestion = 0;
+    let quizScore = 0;
 
-function showPage(page){
- currentPage=page; window.scrollTo({top:0,behavior:'smooth'});
- const pages={home:home,dashboard:dashboard,tutor:tutor,planner:planner,resources:resources,progress:progress,quiz:quiz,notes:notes,exam:exam,profile:profile};
- app.innerHTML=(pages[page]||home)(); app.classList.remove('fade'); void app.offsetWidth; app.classList.add('fade');
- if(page==='progress') setTimeout(drawChart,80);
- if(page==='quiz') renderQuestion();
-}
+    const quizQuestions = [
+        {
+            question: "Which data structure follows the LIFO principle?",
+            options: ["Queue", "Stack", "Array", "Linked List"],
+            answer: 1
+        },
+        {
+            question: "Which searching algorithm requires sorted data?",
+            options: ["Linear Search", "Binary Search", "DFS", "BFS"],
+            answer: 1
+        },
+        {
+            question: "Which sorting algorithm uses divide and conquer?",
+            options: ["Bubble Sort", "Selection Sort", "Merge Sort", "Insertion Sort"],
+            answer: 2
+        },
+        {
+            question: "Which data structure follows FIFO?",
+            options: ["Stack", "Queue", "Tree", "Graph"],
+            answer: 1
+        }
+    ];
 
-function toggleTheme(){document.documentElement.classList.toggle('dark');toast('Theme updated');}
 
-function home(){return `
-<section class="relative overflow-hidden">
-  <div class="absolute -top-32 -right-20 w-96 h-96 bg-indigo-300/30 blur-3xl rounded-full"></div>
-  <div class="absolute top-40 -left-20 w-80 h-80 bg-cyan-300/20 blur-3xl rounded-full"></div>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-28 grid lg:grid-cols-2 gap-12 items-center">
-    <div>
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 font-semibold text-sm">✨ AI-powered personalized learning</div>
-      <h1 class="text-5xl md:text-7xl font-black tracking-tight mt-6 leading-[1.05]">Learning should <span class="gradient-text">adapt to you.</span></h1>
-      <p class="mt-6 text-lg md:text-xl text-slate-600 muted max-w-xl">LearnSmart makes digital learning more effective, efficient, flexible and comfortable with personalized learning, an AI tutor, smart planning and performance insights.</p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <button onclick="showPage('dashboard')" class="px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200">Start Learning →</button>
-        <button onclick="document.getElementById('features').scrollIntoView()" class="px-6 py-3 rounded-xl border border-slate-300 surface font-bold hover:border-indigo-400">Explore Features</button>
-      </div>
-      <div class="grid grid-cols-3 gap-5 mt-10 max-w-lg">
-        <div><b class="text-2xl">10K+</b><p class="text-xs text-slate-500 muted">Resources</p></div>
-        <div><b class="text-2xl">5K+</b><p class="text-xs text-slate-500 muted">Learners</p></div>
-        <div><b class="text-2xl">24/7</b><p class="text-xs text-slate-500 muted">AI Support</p></div>
-      </div>
-    </div>
-    <div class="relative">
-      <div class="glass rounded-3xl p-5 shadow-2xl shadow-indigo-100">
-        <div class="flex items-center justify-between mb-5"><div><p class="text-sm text-slate-500 muted">Today's learning</p><h3 class="font-bold text-xl">Good afternoon, Alex 👋</h3></div><span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">12 day streak 🔥</span></div>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="surface bg-white rounded-2xl p-4 border border-slate-100"><p class="text-xs text-slate-500 muted">Overall progress</p><b class="text-3xl">78%</b><div class="h-2 bg-slate-100 rounded-full mt-3"><div class="h-2 bg-indigo-500 rounded-full w-[78%]"></div></div></div>
-          <div class="surface bg-white rounded-2xl p-4 border border-slate-100"><p class="text-xs text-slate-500 muted">Study time</p><b class="text-3xl">14.5h</b><p class="text-xs text-emerald-600 mt-2">↑ 18% this week</p></div>
-        </div>
-        <div class="mt-4 surface bg-white rounded-2xl p-5 border border-slate-100">
-          <div class="flex justify-between"><div><p class="text-xs text-slate-500 muted">Continue learning</p><b>Data Structures — Trees</b></div><b class="text-indigo-600">71%</b></div>
-          <div class="h-2 bg-slate-100 rounded-full mt-3"><div class="h-2 bg-cyan-500 rounded-full w-[71%]"></div></div>
-          <button onclick="showPage('tutor')" class="mt-4 text-sm font-bold text-indigo-600">Ask AI about this topic →</button>
-        </div>
-      </div>
-      <div class="absolute -bottom-5 -left-5 bg-white surface rounded-2xl shadow-xl p-4 border border-slate-100 hidden sm:block"><b>🎯 AI Recommendation</b><p class="text-xs text-slate-500 muted mt-1">Revise recursion next</p></div>
-    </div>
-  </div>
-</section>
+    /* ================= PAGE NAVIGATION ================= */
 
-<section id="features" class="py-20 bg-white surface">
-<div class="max-w-7xl mx-auto px-4 sm:px-6">
-  <div class="text-center max-w-2xl mx-auto"><span class="text-indigo-600 font-bold">ONE SMART PLATFORM</span><h2 class="text-4xl font-black mt-2">Everything students need to learn better</h2><p class="text-slate-500 muted mt-3">A complete digital learning ecosystem built around the learner.</p></div>
-  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
-    ${[['🤖','AI Tutor','Ask questions, simplify concepts, generate examples and prepare exam-ready answers.','tutor'],['🧭','Adaptive Learning','Follow a learning path that changes with your progress and performance.','dashboard'],['📅','Smart Study Planner','Generate a practical study schedule around your subjects and available time.','planner'],['📊','Learning Analytics','See strengths, weaknesses, accuracy, study time and progress in one place.','progress'],['📝','Smart Notes','Create notes and turn them into summaries, questions and flashcards.','notes'],['🎯','Exam Mode','Get focused revision, important topics and mock tests before your exam.','exam']].map(x=>`<button onclick="showPage('${x[3]}')" class="surface text-left bg-slate-50 border border-slate-100 rounded-2xl p-6 hover:-translate-y-1 hover:shadow-xl transition"><div class="w-12 h-12 rounded-xl bg-indigo-100 grid place-items-center text-2xl">${x[0]}</div><h3 class="font-bold text-xl mt-4">${x[1]}</h3><p class="text-sm text-slate-500 muted mt-2 leading-6">${x[2]}</p><span class="inline-block mt-4 text-indigo-600 text-sm font-bold">Explore →</span></button>`).join('')}
-  </div>
-</div>
-</section>
+    function showPage(pageId) {
 
-<section class="py-20">
-<div class="max-w-7xl mx-auto px-4 sm:px-6">
-<div class="grid lg:grid-cols-2 gap-8 items-center">
-<div><span class="text-indigo-600 font-bold">THE PROBLEM → THE SOLUTION</span><h2 class="text-4xl font-black mt-2">From one-size-fits-all to learning that fits.</h2><p class="text-slate-500 muted mt-4">Traditional learning can leave students behind or unchallenged. LearnSmart continuously uses learning signals to suggest what to learn next.</p></div>
-<div class="grid sm:grid-cols-2 gap-4">
-${[['📚','Scattered materials','One organized learning hub'],['⏰','Poor time management','Smart personalized schedules'],['❓','Difficult concepts','AI explanations on demand'],['📉','Hidden weak areas','Performance-based insights']].map(x=>`<div class="surface bg-white border border-slate-200 rounded-2xl p-5"><div class="text-2xl">${x[0]}</div><p class="font-bold mt-3">${x[1]}</p><p class="text-sm text-indigo-600 mt-1">→ ${x[2]}</p></div>`).join('')}
-</div></div></div>
-</section>
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active');
+        });
 
-<section class="py-20 bg-slate-900 text-white">
-<div class="max-w-5xl mx-auto px-4 text-center"><p class="text-cyan-300 font-bold">HOW IT WORKS</p><h2 class="text-4xl font-black mt-2">Your journey becomes smarter every day.</h2>
-<div class="grid md:grid-cols-4 gap-5 mt-12">${[['01','Tell us about you'],['02','AI understands your needs'],['03','Learn your way'],['04','Improve continuously']].map(x=>`<div class="rounded-2xl border border-white/10 bg-white/5 p-6"><span class="text-cyan-300 font-black">${x[0]}</span><h3 class="font-bold mt-3">${x[1]}</h3></div>`).join('')}</div></div>
-</section>
+        const selectedPage = document.getElementById(pageId);
 
-<section class="py-20"><div class="max-w-5xl mx-auto px-4 text-center"><h2 class="text-4xl font-black">Your learning. Your pace. Your future.</h2><p class="text-slate-500 muted mt-3">Stop studying harder. Start learning smarter.</p><button onclick="showPage('dashboard')" class="mt-7 px-7 py-3 rounded-xl bg-indigo-600 text-white font-bold">Start Your Smart Learning Journey</button></div></section>
-<footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500">© 2026 LearnSmart · Student Innovation — Smart Education</footer>
-`}
+        if (selectedPage) {
+            selectedPage.classList.add('active');
+        }
 
-function shell(title,subtitle,content){
-return `<section class="max-w-7xl mx-auto px-4 sm:px-6 py-10"><div class="mb-8"><p class="text-indigo-600 font-bold text-sm">LEARNSMART</p><h1 class="text-4xl font-black mt-1">${title}</h1><p class="text-slate-500 muted mt-2">${subtitle}</p></div>${content}</section>`;
-}
+        document.querySelectorAll('[data-page]').forEach(item => {
+            item.classList.remove('active');
+        });
 
-function dashboard(){return shell('Student Dashboard','A personalized overview of your learning journey.',`
-<div class="grid lg:grid-cols-3 gap-5">
-<div class="lg:col-span-2 space-y-5">
-<div class="surface bg-gradient-to-r from-indigo-600 to-cyan-500 text-white rounded-3xl p-7"><p class="opacity-80">Good afternoon, Alex 👋</p><h2 class="text-3xl font-black mt-1">Ready to continue learning?</h2><p class="mt-2 opacity-85">You are on a 12-day learning streak. Keep going!</p><button onclick="showPage('planner')" class="mt-5 bg-white text-indigo-700 px-5 py-2.5 rounded-xl font-bold">View Today's Plan</button></div>
-<div class="grid sm:grid-cols-3 gap-4">${[['📚','Topics','24 completed'],['⏱️','Study Time','14.5 hours'],['🎯','Quiz Accuracy','84%']].map(x=>`<div class="surface bg-white border border-slate-200 rounded-2xl p-5"><span class="text-2xl">${x[0]}</span><p class="text-sm text-slate-500 muted mt-2">${x[1]}</p><b class="text-2xl">${x[2]}</b></div>`).join('')}</div>
-<div class="surface bg-white border border-slate-200 rounded-2xl p-6"><div class="flex justify-between items-center"><h3 class="text-xl font-bold">Continue Learning</h3><button onclick="showPage('resources')" class="text-indigo-600 text-sm font-bold">View all</button></div><div class="space-y-5 mt-5">${subjects.map(s=>`<div><div class="flex justify-between text-sm"><span>${s.icon} <b>${s.name}</b></span><span>${s.progress}%</span></div><div class="h-2 bg-slate-100 rounded-full mt-2"><div class="bar h-2 bg-indigo-500 rounded-full" style="width:${s.progress}%"></div></div></div>`).join('')}</div></div>
-</div>
-<div class="space-y-5">
-<div class="surface bg-white border border-slate-200 rounded-2xl p-6"><h3 class="font-bold text-xl">🤖 AI Recommendations</h3><div class="mt-4 p-4 rounded-xl bg-indigo-50"><b>Revise Recursion</b><p class="text-sm text-slate-600 mt-1">Your recent quiz score was 62%.</p><button onclick="showPage('tutor')" class="text-indigo-700 font-bold text-sm mt-3">Study with AI →</button></div><div class="mt-3 p-4 rounded-xl bg-cyan-50"><b>Practice Trees</b><p class="text-sm text-slate-600 mt-1">3 practice questions recommended.</p><button onclick="showPage('quiz')" class="text-cyan-700 font-bold text-sm mt-3">Start quiz →</button></div></div>
-<div class="surface bg-white border border-slate-200 rounded-2xl p-6"><h3 class="font-bold text-xl">Upcoming</h3><div class="mt-4 space-y-3 text-sm">${['Java assignment · Today 6 PM','DSA quiz · Tomorrow','Maths revision · Friday'].map((x,i)=>`<div class="flex gap-3 items-center"><span class="w-2 h-2 rounded-full ${i===0?'bg-rose-500':'bg-indigo-500'}"></span>${x}</div>`).join('')}</div></div>
-</div></div>
-`)}
+        const activeNav = document.querySelector(
+            '[data-page="' + pageId + '"]'
+        );
 
-function tutor(){return shell('AI Tutor','Ask. Understand. Learn. Get explanations at your level.',`
-<div class="grid lg:grid-cols-4 gap-5">
-<div class="surface bg-white border border-slate-200 rounded-2xl p-5">
-<h3 class="font-bold">Learning level</h3><select id="level" class="input w-full mt-3 border rounded-xl p-3 bg-white"><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Exam Preparation</option></select>
-<h3 class="font-bold mt-7">Quick prompts</h3><div class="space-y-2 mt-3">${['Explain simply','Give an example','Quiz me','Summarize','Exam answer'].map(x=>`<button onclick="askAI('${x}')" class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-sm font-semibold">${x}</button>`).join('')}</div>
-</div>
-<div class="lg:col-span-3 surface bg-white border border-slate-200 rounded-2xl overflow-hidden">
-<div class="p-5 border-b border-slate-200 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 grid place-items-center">🤖</div><div><b>LearnSmart AI Tutor</b><p class="text-xs text-emerald-600">● Ready to help</p></div></div>
-<div id="chat" class="p-5 h-[420px] overflow-y-auto space-y-4 bg-slate-50"><div class="max-w-xl bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm"><b>AI Tutor</b><p class="mt-1 text-sm">Hi! Ask me any academic question. I can explain concepts simply, give examples, quiz you, or create exam-ready answers.</p></div></div>
-<div class="p-4 border-t border-slate-200 flex gap-2"><input id="question" class="input flex-1 border rounded-xl p-3" placeholder="Ask: Explain binary search in simple words..."><button onclick="sendAI()" class="px-5 rounded-xl bg-indigo-600 text-white font-bold">Send</button></div>
-</div></div>
-`)}
+        if (activeNav) {
+            activeNav.classList.add('active');
+        }
 
-function askAI(type){document.getElementById('question').value=type+' about Data Structures';sendAI();}
-function sendAI(){
-const input=document.getElementById('question'), chat=document.getElementById('chat'); if(!input.value.trim())return;
-const q=input.value.trim(); chat.innerHTML+=`<div class="ml-auto max-w-xl bg-indigo-600 text-white rounded-2xl rounded-tr-sm p-4"><p class="text-sm">${q}</p></div>`;
-let a='A simple way to understand this is to break the concept into smaller steps. First learn the basic idea, then see an example, and finally practice a few questions. In a real deployment, this interface can be connected to an AI API for live personalized responses.';
-if(q.toLowerCase().includes('binary'))a='<b>Binary Search</b> finds an item in a sorted list by repeatedly checking the middle element and eliminating half of the remaining search space. Its time complexity is <b>O(log n)</b>.';
-if(q.toLowerCase().includes('quiz'))a='<b>Quick quiz:</b> What is the time complexity of binary search on a sorted array? <br><br>A) O(n) &nbsp; B) O(log n) &nbsp; C) O(n²)';
-if(q.toLowerCase().includes('exam'))a='<b>Exam-ready structure:</b><br>1. Definition<br>2. Working principle<br>3. Algorithm/steps<br>4. Example<br>5. Complexity<br>6. Applications';
-setTimeout(()=>{chat.innerHTML+=`<div class="max-w-xl bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm"><b>AI Tutor</b><p class="mt-1 text-sm leading-6">${a}</p></div>`;chat.scrollTop=chat.scrollHeight},350);
-input.value='';
-}
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
 
-function planner(){return shell('Smart Study Planner','Build a focused plan around your goals, time and exam date.',`
-<div class="grid lg:grid-cols-3 gap-5">
-<div class="surface bg-white border border-slate-200 rounded-2xl p-6">
-<h3 class="font-bold text-xl">Create plan</h3>
-<label class="block text-sm font-semibold mt-5">Subjects</label><input id="planSubjects" class="input w-full border rounded-xl p-3 mt-2" value="Java, Data Structures, Mathematics, AI">
-<label class="block text-sm font-semibold mt-4">Hours per day</label><input id="hours" type="number" class="input w-full border rounded-xl p-3 mt-2" value="3" min="1" max="12">
-<label class="block text-sm font-semibold mt-4">Exam date</label><input id="examDate" type="date" class="input w-full border rounded-xl p-3 mt-2">
-<button onclick="generatePlan()" class="mt-5 w-full py-3 rounded-xl bg-indigo-600 text-white font-bold">Generate Smart Plan</button>
-</div>
-<div class="lg:col-span-2 surface bg-white border border-slate-200 rounded-2xl p-6"><div class="flex justify-between"><h3 class="text-xl font-bold">Today's Plan</h3><span class="text-emerald-600 font-bold">3h target</span></div><div id="planList" class="mt-5 space-y-3">${['4:00 PM · Java — OOP Concepts','5:00 PM · Break + Review','5:15 PM · Data Structures — Trees','6:15 PM · Practice Quiz'].map((x,i)=>`<div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50"><input type="checkbox" onchange="toast(this.checked?'Task completed 🎉':'Task reopened')" class="w-5 h-5"><div><b>${x}</b><p class="text-xs text-slate-500 mt-1">${i===1?'15 minute recovery break':'Focused study session'}</p></div></div>`).join('')}</div></div>
-</div>`)}
 
-function generatePlan(){
-const subs=document.getElementById('planSubjects').value.split(',').map(x=>x.trim()).filter(Boolean),h=Number(document.getElementById('hours').value)||3;
-document.getElementById('planList').innerHTML=subs.slice(0,Math.max(2,Math.floor(h))).map((s,i)=>`<div class="flex items-center gap-4 p-4 rounded-xl bg-indigo-50"><span class="text-xl">🎯</span><div><b>${4+i}:00 PM · ${s}</b><p class="text-xs text-slate-600 mt-1">${Math.round(60)} minute focused session · AI-prioritized</p></div></div>`).join('');
-toast('Personalized study plan generated!');
-}
+    /* ================= MOBILE MENU ================= */
 
-function resources(){return shell('Learning Resources','Find notes, videos, question papers and practice material.',`
-<div class="flex flex-col sm:flex-row gap-3"><input id="search" oninput="filterResources()" class="input flex-1 border rounded-xl p-3" placeholder="Search resources..."><select class="input border rounded-xl p-3"><option>All subjects</option><option>Java</option><option>Data Structures</option><option>Mathematics</option><option>AI</option></select></div>
-<div id="resourceGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">${[
-['☕','Java OOP Complete Notes','PDF · 42 pages','Java'],['🌳','Trees & Graphs Practice','30 questions','Data Structures'],['🧠','AI Foundations Video Course','12 videos','AI'],['📐','Vector Calculus Revision','PDF · 28 pages','Mathematics'],['📝','Previous Question Papers','2023–2026 collection','All'],['🎯','DSA Mock Test — Level 2','25 MCQs','Data Structures']
-].map(r=>`<div data-name="${r[1].toLowerCase()}" class="resource surface bg-white border border-slate-200 rounded-2xl p-5"><span class="text-3xl">${r[0]}</span><h3 class="font-bold mt-4">${r[1]}</h3><p class="text-sm text-slate-500 muted mt-1">${r[2]}</p><button onclick="toast('Resource opened in demo mode')" class="mt-5 text-indigo-600 font-bold text-sm">Open Resource →</button></div>`).join('')}</div>
-`)}
-function filterResources(){let q=document.getElementById('search').value.toLowerCase();document.querySelectorAll('.resource').forEach(x=>x.style.display=x.dataset.name.includes(q)?'block':'none')}
+    function toggleMenu() {
 
-const questions=[
-['Which data structure follows LIFO?',['Queue','Stack','Tree','Graph'],1],
-['What is the average time complexity of binary search?',['O(n)','O(log n)','O(n²)','O(1)'],1],
-['Which keyword creates a class in Java?',['function','define','class','object'],2],
-['Which field helps an AI system decide what to do next?',['Perception','Action selection','Storage only','Display'],1]
-];
-function quiz(){return shell('Smart Quiz','Test yourself and get instant performance insights.',`
-<div class="max-w-3xl mx-auto"><div class="surface bg-white border border-slate-200 rounded-3xl p-7">
-<div class="flex justify-between text-sm font-bold"><span>Adaptive Quiz</span><span id="qProgress">Question 1 of ${questions.length}</span></div><div class="h-2 bg-slate-100 rounded-full mt-4"><div id="qBar" class="h-2 bg-indigo-500 rounded-full" style="width:25%"></div></div>
-<div id="questionBox" class="mt-8"></div></div></div>`)}
+        const menu = document.getElementById('mobileMenu');
 
-function renderQuestion(){
-const q=questions[quizIndex],box=document.getElementById('questionBox'); if(!box)return;
-document.getElementById('qProgress').textContent=`Question ${quizIndex+1} of ${questions.length}`;
-document.getElementById('qBar').style.width=((quizIndex+1)/questions.length*100)+'%';
-box.innerHTML=`<h2 class="text-2xl font-black">${q[0]}</h2><div class="grid gap-3 mt-6">${q[1].map((a,i)=>`<button onclick="answer(${i})" class="answer text-left p-4 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 font-semibold">${String.fromCharCode(65+i)}. ${a}</button>`).join('')}</div>`;
-}
-function answer(i){
-const q=questions[quizIndex];document.querySelectorAll('.answer').forEach(b=>b.disabled=true);
-if(i===q[2]){quizScore++;toast('Correct! 🎉')}else toast('Not quite — keep learning!');
-setTimeout(()=>{quizIndex++;if(quizIndex<questions.length)renderQuestion();else{document.getElementById('questionBox').innerHTML=`<div class="text-center py-8"><div class="text-6xl">🏆</div><h2 class="text-3xl font-black mt-4">Quiz complete!</h2><p class="text-slate-500 mt-2">You scored ${quizScore}/${questions.length} (${Math.round(quizScore/questions.length*100)}%).</p><button onclick="quizIndex=0;quizScore=0;showPage('quiz')" class="mt-6 px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold">Try Again</button><button onclick="showPage('progress')" class="ml-2 px-5 py-3 rounded-xl border font-bold">View Insights</button></div>`}},400);
-}
+        if (menu) {
+            menu.classList.toggle('hidden');
+        }
+    }
 
-function progress(){return shell('My Insights','Understand your learning patterns and focus where it matters.',`
-<div class="grid lg:grid-cols-3 gap-5">
-<div class="surface bg-white border border-slate-200 rounded-2xl p-6 lg:col-span-2"><h3 class="font-bold text-xl">Weekly Study Activity</h3><canvas id="chart" class="mt-5"></canvas></div>
-<div class="surface bg-white border border-slate-200 rounded-2xl p-6"><h3 class="font-bold text-xl">Learning Score</h3><div class="text-6xl font-black text-indigo-600 mt-5">78</div><p class="text-sm text-slate-500 mt-1">Overall progress</p><div class="mt-6 space-y-4">${[['Java','82%'],['DSA','71%'],['Maths','65%'],['AI','88%']].map(x=>`<div><div class="flex justify-between text-sm"><b>${x[0]}</b><span>${x[1]}</span></div><div class="h-2 bg-slate-100 rounded mt-2"><div class="h-2 bg-indigo-500 rounded" style="width:${x[1]}"></div></div></div>`).join('')}</div></div>
-</div>
-<div class="grid md:grid-cols-2 gap-5 mt-5"><div class="surface bg-white border border-slate-200 rounded-2xl p-6"><h3 class="font-bold text-xl">💪 Strong Areas</h3><p class="mt-4 text-emerald-600 font-semibold">Java Basics · AI Foundations · Arrays</p></div><div class="surface bg-white border border-slate-200 rounded-2xl p-6"><h3 class="font-bold text-xl">📈 Needs Improvement</h3><p class="mt-4 text-amber-600 font-semibold">Recursion · Trees · Vector Calculus</p><button onclick="showPage('planner')" class="mt-4 text-indigo-600 font-bold text-sm">Create improvement plan →</button></div></div>
-`)}
 
-function drawChart(){new Chart(document.getElementById('chart'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Study hours',data:[1.5,2,1,2.5,1.5,3.5,2.5],tension:.35}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}
+    /* ================= DARK / LIGHT THEME ================= */
 
-function notes(){return shell('Smart Notes','Organize your knowledge and turn notes into active learning.',`
-<div class="grid lg:grid-cols-3 gap-5"><div class="lg:col-span-2 surface bg-white border border-slate-200 rounded-2xl p-6"><input id="noteTitle" class="input w-full text-xl font-bold border-0 outline-none" placeholder="Note title" value="Binary Search — Quick Revision"><textarea id="noteText" class="input w-full h-72 mt-4 border rounded-xl p-4" placeholder="Write your notes...">Binary search works on sorted data. Compare the target with the middle element and eliminate half of the search space.</textarea><div class="flex flex-wrap gap-2 mt-4"><button onclick="toast('Note saved ✓')" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold">Save Note</button><button onclick="toast('AI summary generated')" class="px-5 py-2.5 rounded-xl bg-cyan-100 text-cyan-800 font-bold">✨ Summarize</button><button onclick="toast('Practice questions generated')" class="px-5 py-2.5 rounded-xl bg-emerald-100 text-emerald-800 font-bold">Generate Questions</button></div></div><div class="surface bg-white border border-slate-200 rounded-2xl p-6"><h3 class="font-bold">Pinned Notes</h3>${['Java OOP','Binary Search','AI Agents','Maths Formulas'].map(x=>`<div class="mt-4 p-3 rounded-xl bg-slate-50 text-sm font-semibold">📌 ${x}</div>`).join('')}</div></div>`)}
+    function toggleTheme() {
 
-function exam(){return shell('Exam Mode','Focused preparation based on time remaining, priority and weak areas.',`
-<div class="surface bg-gradient-to-br from-slate-900 to-indigo-900 text-white rounded-3xl p-8"><p class="text-cyan-300 font-bold">EXAM COUNTDOWN</p><div class="text-6xl font-black mt-2">23 <span class="text-2xl">days</span></div><p class="opacity-70 mt-2">Stay consistent. Your plan is ready.</p><div class="grid sm:grid-cols-3 gap-4 mt-7">${[['⭐','Important Topics','18'],['📝','Mock Tests','6'],['⚠️','Weak Areas','3']].map(x=>`<div class="bg-white/10 rounded-2xl p-5"><span>${x[0]}</span><p class="text-sm opacity-70 mt-2">${x[1]}</p><b class="text-2xl">${x[2]}</b></div>`).join('')}</div></div>
-<div class="grid md:grid-cols-2 gap-5 mt-5">${[['🎯','Priority Revision','Recursion, Trees and Vector Calculus','planner'],['🧪','Mock Test','25 adaptive questions','quiz'],['⚡','Last-Minute Revision','Concise definitions, formulas and key points','notes'],['🤖','Ask AI','Clear a difficult concept before the exam','tutor']].map(x=>`<button onclick="showPage('${x[3]}')" class="surface text-left bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg"><span class="text-3xl">${x[0]}</span><h3 class="font-bold text-xl mt-4">${x[1]}</h3><p class="text-sm text-slate-500 muted mt-2">${x[2]}</p><span class="text-indigo-600 font-bold text-sm inline-block mt-4">Open →</span></button>`).join('')}</div>
-`)}
+        document.documentElement.classList.toggle('dark');
 
-function profile(){return shell('Student Profile','Personalize the platform around your learning goals.',`
-<div class="max-w-3xl surface bg-white border border-slate-200 rounded-3xl p-7"><div class="flex items-center gap-5"><div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 text-white grid place-items-center text-3xl font-black">AK</div><div><h2 class="text-2xl font-black">Alex Kumar</h2><p class="text-slate-500">B.Tech · Computer Science · 2nd Year</p></div></div><div class="grid sm:grid-cols-2 gap-4 mt-8">${[['Course','B.Tech — Computer Science'],['Year','2nd Year'],['Goal','Score above 90%'],['Preferred mode','Visual + Practice']].map(x=>`<div class="p-4 rounded-xl bg-slate-50"><p class="text-xs text-slate-500">${x[0]}</p><b>${x[1]}</b></div>`).join('')}</div><button onclick="toast('Profile preferences saved')" class="mt-6 px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Preferences</button></div>
-`)}
-showPage('home');
+        const isDark =
+            document.documentElement.classList.contains('dark');
+
+        localStorage.setItem(
+            'learnsmart-theme',
+            isDark ? 'dark' : 'light'
+        );
+
+        showToast(
+            isDark
+                ? 'Dark mode enabled'
+                : 'Light mode enabled'
+        );
+    }
+
+
+    function loadTheme() {
+
+        const savedTheme =
+            localStorage.getItem('learnsmart-theme');
+
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    }
+
+
+    /* ================= TOAST MESSAGE ================= */
+
+    function showToast(message) {
+
+        const oldToast =
+            document.getElementById('learnsmartToast');
+
+        if (oldToast) {
+            oldToast.remove();
+        }
+
+        const toast =
+            document.createElement('div');
+
+        toast.id = 'learnsmartToast';
+
+        toast.className =
+            'fixed bottom-6 right-6 z-[9999] ' +
+            'bg-slate-900 text-white px-5 py-3 ' +
+            'rounded-xl shadow-xl text-sm font-semibold';
+
+        toast.textContent = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+
+        }, 2200);
+    }
+
+
+    /* ================= STUDY PLANNER ================= */
+
+    function addStudyTask() {
+
+        const taskInput =
+            document.getElementById('taskInput');
+
+        const taskList =
+            document.getElementById('taskList');
+
+        if (!taskInput || !taskList) {
+            return;
+        }
+
+        const task =
+            taskInput.value.trim();
+
+        if (!task) {
+
+            showToast('Please enter a study task.');
+
+            return;
+        }
+
+        const item =
+            document.createElement('div');
+
+        item.className =
+            'flex items-center justify-between ' +
+            'gap-3 p-4 rounded-xl bg-slate-50 ' +
+            'border border-slate-100';
+
+        item.innerHTML = `
+            <div class="flex items-center gap-3">
+                <input
+                    type="checkbox"
+                    onchange="completeTask(this)"
+                    class="w-5 h-5 accent-indigo-600"
+                >
+
+                <span class="task-text font-semibold text-sm">
+                    ${escapeHTML(task)}
+                </span>
+            </div>
+
+            <button
+                onclick="this.parentElement.parentElement.remove()"
+                class="text-rose-500 font-bold">
+                ✕
+            </button>
+        `;
+
+        taskList.appendChild(item);
+
+        taskInput.value = '';
+
+        showToast('Study task added.');
+    }
+
+
+    function completeTask(checkbox) {
+
+        const text =
+            checkbox.parentElement.querySelector(
+                '.task-text'
+            );
+
+        if (!text) {
+            return;
+        }
+
+        if (checkbox.checked) {
+
+            text.classList.add(
+                'line-through',
+                'text-slate-400'
+            );
+
+        } else {
+
+            text.classList.remove(
+                'line-through',
+                'text-slate-400'
+            );
+        }
+    }
+
+
+    /* ================= SMART NOTES ================= */
+
+    function saveNote() {
+
+        const title =
+            document.getElementById('noteTitle');
+
+        const content =
+            document.getElementById('noteContent');
+
+        if (!title || !content) {
+            return;
+        }
+
+        if (!title.value.trim() &&
+            !content.value.trim()) {
+
+            showToast('Write something before saving.');
+
+            return;
+        }
+
+        const notes =
+            JSON.parse(
+                localStorage.getItem('learnsmart-notes')
+                || '[]'
+            );
+
+        notes.push({
+            title: title.value.trim() || 'Untitled Note',
+            content: content.value.trim(),
+            date: new Date().toLocaleDateString()
+        });
+
+        localStorage.setItem(
+            'learnsmart-notes',
+            JSON.stringify(notes)
+        );
+
+        title.value = '';
+        content.value = '';
+
+        showToast('Note saved successfully.');
+    }
+
+
+    /* ================= RESOURCE SEARCH ================= */
+
+    function searchResources() {
+
+        const input =
+            document.getElementById('resourceSearch');
+
+        const cards =
+            document.querySelectorAll('.resource-card');
+
+        if (!input) {
+            return;
+        }
+
+        const query =
+            input.value.toLowerCase().trim();
+
+        cards.forEach(card => {
+
+            const text =
+                card.textContent.toLowerCase();
+
+            card.style.display =
+                text.includes(query)
+                    ? ''
+                    : 'none';
+        });
+    }
+
+
+    function openResource(resourceName) {
+
+        showToast(
+            'Opening ' + resourceName + '...'
+        );
+    }
+
+
+    /* ================= QUIZ ================= */
+
+    function startQuiz() {
+
+        currentQuizQuestion = 0;
+        quizScore = 0;
+
+        showPage('quiz');
+
+        displayQuizQuestion();
+    }
+
+
+    function displayQuizQuestion() {
+
+        const container =
+            document.getElementById('quizContainer');
+
+        if (!container) {
+            return;
+        }
+
+        const q =
+            quizQuestions[currentQuizQuestion];
+
+        if (!q) {
+            showQuizResult();
+            return;
+        }
+
+        container.innerHTML = `
+
+            <div class="mb-6">
+
+                <p class="text-sm text-slate-500">
+                    Question ${currentQuizQuestion + 1}
+                    of ${quizQuestions.length}
+                </p>
+
+                <h3 class="text-xl font-extrabold mt-2">
+                    ${escapeHTML(q.question)}
+                </h3>
+
+            </div>
+
+
+            <div class="space-y-3">
+
+                ${q.options.map((option, index) => `
+
+                    <button
+                        onclick="answerQuiz(${index})"
+                        class="quiz-option w-full text-left
+                        p-4 rounded-xl border
+                        border-slate-200 bg-white
+                        hover:bg-indigo-50
+                        hover:border-indigo-300
+                        font-semibold">
+
+                        ${escapeHTML(option)}
+
+                    </button>
+
+                `).join('')}
+
+            </div>
+
+        `;
+    }
+
+
+    function answerQuiz(selectedAnswer) {
+
+        const question =
+            quizQuestions[currentQuizQuestion];
+
+        if (!question) {
+            return;
+        }
+
+        if (selectedAnswer === question.answer) {
+
+            quizScore++;
+
+            showToast('Correct answer! 🎉');
+
+        } else {
+
+            showToast('Not quite. Keep learning!');
+
+        }
+
+        setTimeout(() => {
+
+            currentQuizQuestion++;
+
+            displayQuizQuestion();
+
+        }, 700);
+    }
+
+
+    function nextQuizQuestion() {
+
+        currentQuizQuestion++;
+
+        displayQuizQuestion();
+    }
+
+
+    function showQuizResult() {
+
+        const container =
+            document.getElementById('quizContainer');
+
+        if (!container) {
+            return;
+        }
+
+        const percentage =
+            Math.round(
+                (quizScore / quizQuestions.length) * 100
+            );
+
+        container.innerHTML = `
+
+            <div class="text-center py-8">
+
+                <div class="text-6xl">
+                    🏆
+                </div>
+
+                <h3 class="text-2xl font-extrabold mt-4">
+                    Quiz Complete!
+                </h3>
+
+                <p class="text-slate-500 mt-2">
+                    You scored
+                    <strong>${quizScore}</strong>
+                    out of
+                    <strong>${quizQuestions.length}</strong>
+                </p>
+
+                <div class="text-4xl font-extrabold
+                            text-indigo-600 mt-5">
+                    ${percentage}%
+                </div>
+
+                <button
+                    onclick="startQuiz()"
+                    class="mt-6 px-6 py-3 rounded-xl
+                           bg-indigo-600 text-white
+                           font-bold">
+
+                    Try Again
+
+                </button>
+
+            </div>
+
+        `;
+    }
+
+
+    /* ================= EXAM AI SHORTCUT ================= */
+
+    function openExamTutor() {
+
+        showPage('ai');
+
+        const input =
+            document.getElementById('question');
+
+        if (input) {
+
+            input.value =
+                'Give me an exam-ready answer about Data Structures';
+
+            input.focus();
+        }
+    }
+
+
+    /* ================= AI TUTOR ================= */
+
+    const AI_API_URL = '/api/chat';
+
+
+    function escapeHTML(value) {
+
+        return String(value ?? '')
+            .replace(/[&<>"']/g, function(character) {
+
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[character];
+
+            });
+    }
+
+
+    function formatAIText(value) {
+
+        return escapeHTML(value)
+            .replace(
+                /\*\*(.*?)\*\*/g,
+                '<strong>$1</strong>'
+            )
+            .replace(/\n/g, '<br>');
+    }
+    /* ================= AI QUICK PROMPTS ================= */
+
+    function askAI(type) {
+
+        const input =
+            document.getElementById('question');
+
+        if (!input) {
+            return;
+        }
+
+        let topic = 'Data Structures';
+
+        if (type === 'Explain simply') {
+            input.value =
+                'Explain ' + topic +
+                ' in very simple words with an example.';
+        }
+
+        else if (type === 'Give an example') {
+            input.value =
+                'Give me a simple real-world example of ' +
+                topic + ' and explain it.';
+        }
+
+        else if (type === 'Quiz me') {
+            input.value =
+                'Quiz me on ' + topic +
+                ' with 5 questions. Ask one question at a time.';
+        }
+
+        else if (type === 'Summarize') {
+            input.value =
+                'Summarize the important points of ' +
+                topic + ' for quick revision.';
+        }
+
+        else if (type === 'Exam answer') {
+            input.value =
+                'Give me an exam-ready answer on ' +
+                topic + ' with definition, explanation, example, ' +
+                'and important points.';
+        }
+
+        else {
+            input.value =
+                type + ' about ' + topic;
+        }
+
+        sendAI();
+    }
+
+
+    /* ================= SEND QUESTION TO AI ================= */
+
+    async function sendAI() {
+
+        const input =
+            document.getElementById('question');
+
+        const chat =
+            document.getElementById('chat');
+
+        const level =
+            document.getElementById('level');
+
+        if (!input || !chat) {
+            return;
+        }
+
+        const question =
+            input.value.trim();
+
+        if (!question) {
+
+            showToast(
+                'Please enter a question.'
+            );
+
+            return;
+        }
+
+
+        /* Student message */
+
+        const studentMessage =
+            document.createElement('div');
+
+        studentMessage.className =
+            'ml-auto max-w-xl bg-indigo-600 ' +
+            'text-white rounded-2xl rounded-tr-sm p-4';
+
+        studentMessage.innerHTML =
+            '<p class="text-sm">' +
+            escapeHTML(question) +
+            '</p>';
+
+        chat.appendChild(studentMessage);
+
+
+        /* AI loading message */
+
+        const loading =
+            document.createElement('div');
+
+        loading.className =
+            'max-w-xl bg-white rounded-2xl ' +
+            'rounded-tl-sm p-4 shadow-sm';
+
+        loading.innerHTML =
+            '<b>AI Tutor</b>' +
+            '<p class="mt-1 text-sm text-slate-500">' +
+            'Thinking…</p>';
+
+        chat.appendChild(loading);
+
+        chat.scrollTop =
+            chat.scrollHeight;
+
+        input.value = '';
+        input.disabled = true;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    AI_API_URL,
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body: JSON.stringify({
+
+                            message: question,
+
+                            level:
+                                level
+                                    ? level.value
+                                    : 'Beginner'
+
+                        })
+                    }
+                );
+
+
+            const data =
+                await response
+                    .json()
+                    .catch(() => ({}));
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    'AI service error.'
+                );
+            }
+
+
+            if (!data.answer) {
+
+                throw new Error(
+                    'No answer was returned by the AI service.'
+                );
+            }
+
+
+            loading.innerHTML =
+                '<b>AI Tutor</b>' +
+                '<p class="mt-1 text-sm leading-6">' +
+                formatAIText(data.answer) +
+                '</p>';
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                'AI Tutor error:',
+                error
+            );
+
+            loading.innerHTML =
+                '<b>AI Tutor</b>' +
+                '<p class="mt-1 text-sm leading-6 text-rose-600">' +
+                escapeHTML(
+                    error.message ||
+                    'Unable to reach AI Tutor.'
+                ) +
+                '</p>';
+
+            showToast(
+                'AI Tutor could not connect.'
+            );
+        }
+
+
+        finally {
+
+            input.disabled = false;
+
+            input.focus();
+
+            chat.scrollTop =
+                chat.scrollHeight;
+        }
+    }
+
+
+    /* ================= ENTER KEY SUPPORT ================= */
+
+    document.addEventListener(
+        'keydown',
+        function(event) {
+
+            const input =
+                document.getElementById('question');
+
+            if (
+                event.key === 'Enter' &&
+                document.activeElement === input &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendAI();
+            }
+        }
+    );
+
+
+    /* ================= PAGE INITIALIZATION ================= */
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function() {
+
+            loadTheme();
+
+            showPage('dashboard');
+
+        }
+    );
+
+
 </script>
+
 </body>
 </html>
+              
