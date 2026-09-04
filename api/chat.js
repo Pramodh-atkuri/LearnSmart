@@ -1,97 +1,83 @@
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-const allowedOrigins = [
-  "https://pramodh-atkuri.github.io",
-  "http://localhost:3000",
-  "http://localhost:5173"
-];
-
 export default async function handler(req, res) {
-  const origin = req.headers.origin;
-
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
+  // Only allow POST requests
   if (req.method !== "POST") {
     return res.status(405).json({
-      error: "Method not allowed"
-    });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({
-      error: "OPENAI_API_KEY is not configured."
+      error: "Method not allowed. Use POST.",
     });
   }
 
   try {
-    const { message, level, history } = req.body || {};
+    const { message, messages } = req.body || {};
 
-    if (!message || typeof message !== "string") {
+    // Check that we received a message
+    if (
+      (!message || typeof message !== "string") &&
+      (!Array.isArray(messages) || messages.length === 0)
+    ) {
       return res.status(400).json({
-        error: "Please enter a question."
+        error: "Please provide a message.",
       });
     }
 
-    if (message.length > 4000) {
-      return res.status(400).json({
-        error: "Question is too long."
-      });
+    // Build conversation input
+    let input = [];
+
+    if (Array.isArray(messages) && messages.length > 0) {
+      input = messages
+        .filter(
+          (item) =>
+            item &&
+            (item.role === "user" ||
+              item.role === "assistant" ||
+              item.role === "system")
+        )
+        .map((item) => ({
+          role: item.role,
+          content: String(item.content || ""),
+        }))
+        .filter((item) => item.content.trim() !== "");
     }
 
-    const recentHistory = Array.isArray(history)
-      ? history.slice(-10)
-      : [];
-
-    const input = [
-      {
-        role: "system",
-        content:
-          "You are LearnSmart AI Tutor, an educational assistant for students. " +
-          "Explain concepts clearly and step-by-step using simple language. " +
-          "Give examples when useful. For exam questions, provide an exam-ready structure. " +
-          "Encourage understanding rather than simply giving answers. " +
-          `The student's level is ${level || "student"}.`
-      },
-      ...recentHistory.map(item => ({
-        role: item.role === "assistant" ? "assistant" : "user",
-        content: String(item.content || "")
-      })),
-      {
+    // Add the latest user message if provided
+    if (message && typeof message === "string" && message.trim() !== "") {
+      input.push({
         role: "user",
-        content: message
-      }
-    ];
+        content: message.trim(),
+      });
+    }
 
+    // Make sure there is something to send
+    if (input.length === 0) {
+      return res.status(400).json({
+        error: "No valid message was provided.",
+      });
+    }
+
+    // Ask the AI
     const response = await client.responses.create({
       model: "gpt-5.6-luna",
+      instructions:
+        "You are LearnSmart AI Tutor. Help students understand academic topics clearly and accurately. Explain concepts step by step, use simple language when appropriate, provide examples, and encourage learning. Do not simply give unexplained answers.",
       input,
-      max_output_tokens: 900
+      max_output_tokens: 900,
     });
 
     return res.status(200).json({
       answer:
         response.output_text ||
-        "Sorry, I couldn't generate an answer."
+        "Sorry, I couldn't generate an answer.",
     });
-
   } catch (error) {
     console.error("AI Tutor error:", error);
 
     return res.status(500).json({
-      error: "The AI Tutor could not process your request right now."
+      error: "The AI Tutor could not process your request right now.",
     });
   }
 }
